@@ -74,7 +74,9 @@ export const register: Register = on => {
     })
     // The box draws plain text, so markdown marks like *cursiva* would show as literal symbols.
     const raw = r.isAnswered ? r.text.trim().split('\n')[0]?.replace(/[*_`]/g, '').trim() : undefined
-    const line = raw && raw.replace(/[.\s]/g, '').toUpperCase() !== SKIP ? raw : undefined
+    // The model may wrap the skip signal in quotes or add words ("Nada que resumir"): any reply that starts with it means no box.
+    const isSkip = raw !== undefined && new RegExp(`^[^\\p{L}]*${SKIP}(?!\\p{L})`, 'iu').test(raw)
+    const line = raw && !isSkip ? raw : undefined
     // A new prompt may have cleared or replaced the box while the model was answering.
     await update($, summary, s => (s?.turnId === turnId ? (line ? { turnId, line } : null) : s))
     return out

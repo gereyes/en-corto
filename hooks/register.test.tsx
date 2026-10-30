@@ -12,6 +12,7 @@ const turn = (answer: string, turnId: string, extra: Record<string, unknown> = {
 
 test('shows a one-line summary above the prompt only for long explanations', async ($, on) => {
   const asked: string[] = []
+  let skipReply = 'NADA.'
   on('session.start', async ($, e) => ({ cwd: e.cwd }) as never)
   on('command.register', async () => ({ value: undefined }) as never)
   on('prompt.submit', async ($, e) => e as never)
@@ -19,7 +20,7 @@ test('shows a one-line summary above the prompt only for long explanations', asy
   on('model.complete', async ($, e) => {
     const prompt = String((e as { prompt: unknown }).prompt)
     asked.push(prompt)
-    const text = prompt.includes('reporte') ? 'NADA.' : 'La agricultura permitió las primeras ciudades.\nlínea extra'
+    const text = prompt.includes('reporte') ? skipReply : 'La agricultura permitió las primeras ciudades.\nlínea extra'
     return { value: { isAnswered: true, text, usage: {} } } as never
   })
   on('ui.render', async ($, e) => {
@@ -57,11 +58,20 @@ test('shows a one-line summary above the prompt only for long explanations', asy
   expect(asked.length).toBe(2)
   expect((await box()).isShown).toBe(false)
 
+  for (const reply of ['"NADA"', 'Nada que resumir.']) {
+    skipReply = reply
+    await $.turn.complete(turn(STATUS, 't4'))
+    expect((await box()).isShown).toBe(false)
+  }
+  skipReply = 'Nadar mejora la salud.'
+  await $.turn.complete(turn(STATUS, 't4'))
+  expect((await box()).isShown).toBe(true)
+
   await $.turn.complete(turn(LONG, 't5'))
   await $.prompt.submit({ text: 'otra cosa' } as never)
   expect((await box()).isShown).toBe(false)
 
   await $.command.run({ command: 'en-corto', args: '' } as never)
   await $.turn.complete(turn(LONG, 't6'))
-  expect(asked.length).toBe(3)
+  expect(asked.length).toBe(6)
 })
