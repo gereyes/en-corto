@@ -1,6 +1,6 @@
 # En corto
 
-Mod para Claude Code que resume en una sola línea cada respuesta larga de Claude y la muestra en un recuadro arriba de donde escribes.
+Mod para Claude Code que resume en una sola línea cada respuesta larga de Claude y la muestra en un recuadro debajo de la respuesta, justo arriba del cuadro donde escribes.
 
 Sirve para leer rápido: si no tienes tiempo o energía para leer toda la respuesta, lees el recuadro y sabes de qué trató y si te toca hacer algo.
 
@@ -8,7 +8,7 @@ Sirve para leer rápido: si no tienes tiempo o energía para leer toda la respue
 
 - Cuando una respuesta pasa de 120 palabras (sin contar bloques de código ni tablas, que ya se leen de un vistazo), el mod se la pasa a Haiku, el modelo más barato de Claude.
 - Si la respuesta explica algo, Haiku escribe su idea central en una línea, aunque la respuesta termine con una pregunta. Si solo reporta avance o confirma algo hecho, no se muestra nada.
-- El resumen aparece en un recuadro arriba del prompt. Se reemplaza con cada respuesta nueva y desaparece cuando mandas tu siguiente mensaje.
+- El resumen aparece en un recuadro debajo de la respuesta de Claude, justo arriba del cuadro donde escribes. Se reemplaza con cada respuesta nueva y desaparece cuando mandas tu siguiente mensaje.
 - Las respuestas cortas y las de los subagentes se ignoran.
 - El resumen sale en el idioma de la respuesta.
 

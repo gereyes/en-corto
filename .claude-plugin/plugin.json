@@ -1,7 +1,7 @@
 {
   "name": "en-corto",
-  "version": "0.2.1",
-  "description": "Resume en una línea cada respuesta larga de Claude y la muestra en un recuadro arriba del prompt",
+  "version": "0.2.2",
+  "description": "Resume en una línea cada respuesta larga de Claude y la muestra en un recuadro debajo de la respuesta, justo arriba del cuadro donde escribes",
   "author": { "name": "gereyes" },
   "license": "MIT",
   "types": "./types/index.d.ts"
