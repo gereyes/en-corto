@@ -1,0 +1,6 @@
+{
+  "name": "en-corto",
+  "description": "Mod de Claude Code que resume en una línea las explicaciones largas",
+  "owner": { "name": "gereyes" },
+  "plugins": [{ "name": "en-corto", "source": "./" }]
+}

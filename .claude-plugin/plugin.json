@@ -1,0 +1,8 @@
+{
+  "name": "en-corto",
+  "version": "0.2.0",
+  "description": "Resume en una línea cada respuesta larga de Claude y la muestra en un recuadro arriba del prompt",
+  "author": { "name": "gereyes" },
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}
