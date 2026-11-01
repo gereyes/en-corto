@@ -32,7 +32,11 @@ export function proseWords(text: string) {
 }
 
 export const register: Register = on => {
+  // The box only draws on the terminal and desktop: elsewhere (claude -p, the SDK, VS Code) a summary would be paid for and never seen.
+  let canDraw = false
+
   on('session.start', async ($, e, next) => {
+    canDraw = e.isInteractive && (e.surface === 'terminal' || e.surface === 'desktop')
     await $.command.register({
       name: 'en-corto',
       description: 'Prende o apaga el resumen de una línea de las respuestas largas',
@@ -58,27 +62,32 @@ export const register: Register = on => {
     if (e.agentId) return out
     // Every finished answer replaces the box, so a summary never outlives the answer it describes.
     await update($, summary, () => null)
-    if (e.isAborted || e.reason !== 'answer') return out
+    if (!canDraw || e.isAborted || e.reason !== 'answer') return out
     if (proseWords(e.answer) < MIN_WORDS) return out
     if ((await $.store.get(OFF)) === true) return out
 
     const turnId = e.turnId
     await update($, summary, () => ({ turnId, line: null }))
-    const r = await $.model.complete({
-      model: 'haiku',
-      system: SYSTEM,
-      prompt: `<respuesta>\n${e.answer}\n</respuesta>`,
-      maxTokens: 120,
-      effort: 'low',
-      timeoutMs: 15_000,
-    })
-    // The box draws plain text, so markdown marks like *cursiva* would show as literal symbols.
-    const raw = r.isAnswered ? r.text.trim().split('\n')[0]?.replace(/[*_`]/g, '').trim() : undefined
-    // The model may wrap the skip signal in quotes or add words ("Nada que resumir"): any reply that starts with it means no box.
-    const isSkip = raw !== undefined && new RegExp(`^[^\\p{L}]*${SKIP}(?!\\p{L})`, 'iu').test(raw)
-    const line = raw && !isSkip ? raw : undefined
-    // A new prompt may have cleared or replaced the box while the model was answering.
-    await update($, summary, s => (s?.turnId === turnId ? (line ? { turnId, line } : null) : s))
+    let line: string | undefined
+    try {
+      const r = await $.model.complete({
+        model: 'haiku',
+        system: SYSTEM,
+        prompt: `<respuesta>\n${e.answer}\n</respuesta>`,
+        maxTokens: 120,
+        effort: 'low',
+        timeoutMs: 15_000,
+      })
+      // The box draws plain text, so markdown marks like *cursiva* would show as literal symbols.
+      const raw = r.isAnswered ? r.text.trim().split('\n')[0]?.replace(/[*_`]/g, '').trim() : undefined
+      // The model may wrap the skip signal in quotes or add words ("Nada que resumir"): any reply that starts with it means no box.
+      const isSkip = raw !== undefined && new RegExp(`^[^\\p{L}]*${SKIP}(?!\\p{L})`, 'iu').test(raw)
+      line = raw && !isSkip ? raw : undefined
+    } finally {
+      // Whether the call answered, failed or was refused (say, Haiku not allowed), the box never stays on "Resumiendo…".
+      // A new prompt may have cleared or replaced the box while the model was answering.
+      await update($, summary, s => (s?.turnId === turnId ? (line ? { turnId, line } : null) : s))
+    }
     return out
   })
 
