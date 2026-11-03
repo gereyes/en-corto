@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/icon.png" alt="" width="96">
+
 # En corto
 
 **La idea central de cada explicación larga de Claude, en una sola línea.**

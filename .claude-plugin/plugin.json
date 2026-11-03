@@ -1,8 +1,9 @@
 {
   "name": "en-corto",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Resume en una línea cada respuesta larga de Claude y la muestra en un recuadro debajo de la respuesta, justo arriba del cuadro donde escribes",
   "author": { "name": "gereyes" },
   "license": "MIT",
-  "types": "./types/index.d.ts"
+  "types": "./types/index.d.ts",
+  "icon": "./assets/icon.png"
 }
